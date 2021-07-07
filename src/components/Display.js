@@ -13,12 +13,13 @@ export default function Display() {
     const [js, setJs] = useState()
     const [css, setCss] = useState()
     const [isSet, setIsSet] = useState(false);
+    const id=currentUser.uid
     useEffect(() => {
         db.collection('yourcodepen').get()
             .then(snapshot => {
                 snapshot.docs.forEach(doc => {
                     console.log(doc.id)
-                    if (doc.id == currentUser.uid) {
+                    if (doc.id == id) {
                         var result = doc.data()
                         setHtml(result['html'])
                         setJs(result['js'])
@@ -26,12 +27,12 @@ export default function Display() {
                         setIsSet(true)
                     }
                 })
-                if (isSet == false) {
-                    setHtml('write your html here')
-                    setJs('write your js here')
-                    setCss('write your css here')
-                }
             })
+            if (isSet == false) {
+                setHtml('write your html here')
+                setJs('write your js here')
+                setCss('write your css here')
+            }
     }, [])
     const [srcDoc, setSrcDoc] = useState('')
 
@@ -45,7 +46,8 @@ export default function Display() {
           </html>
         `)
             let data = { html, css, js }
-            db.collection('yourcodepen').doc(currentUser.uid).set(data);
+
+            db.collection('yourcodepen').doc(id).set(data);
         }, 1000)
 
         return () => clearTimeout(timeout)
