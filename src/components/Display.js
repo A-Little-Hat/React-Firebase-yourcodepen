@@ -12,15 +12,25 @@ export default function Display() {
     const [html, setHtml] = useState()
     const [js, setJs] = useState()
     const [css, setCss] = useState()
+    const [isSet, setIsSet] = useState(false);
     useEffect(() => {
-        db.collection(currentUser.uid).get()
+        db.collection('yourcodepen').get()
             .then(snapshot => {
                 snapshot.docs.forEach(doc => {
-                    var result = doc.data()
-                    setHtml(result['html'])
-                    setJs(result['js'])
-                    setCss(result['css'])
+                    console.log(doc.id)
+                    if (doc.id == currentUser.uid) {
+                        var result = doc.data()
+                        setHtml(result['html'])
+                        setJs(result['js'])
+                        setCss(result['css'])
+                        setIsSet(true)
+                    }
                 })
+                if (isSet == false) {
+                    setHtml('write your html here')
+                    setJs('write your js here')
+                    setCss('write your css here')
+                }
             })
     }, [])
     const [srcDoc, setSrcDoc] = useState('')
@@ -35,15 +45,15 @@ export default function Display() {
           </html>
         `)
             let data = { html, css, js }
-            db.collection(currentUser.uid).doc('LA').set(data);
+            db.collection('yourcodepen').doc(currentUser.uid).set(data);
         }, 1000)
 
         return () => clearTimeout(timeout)
     }, [html, css, js])
 
-    const download = ()=>{
-            var blob = new Blob([srcDoc], {type: "text/html;charset=utf-8"});
-            saveAs(blob, "yourcodepen.html");
+    const download = () => {
+        var blob = new Blob([srcDoc], { type: "text/html;charset=utf-8" });
+        saveAs(blob, "yourcodepen.html");
     }
     return (
         <React.Fragment>
@@ -70,7 +80,7 @@ export default function Display() {
             <div className="pane-bottom output" style={{ padding: "1%" }}>
                 <div className="head">
                     <Button className="download" onClick={download} variant="outline-primary">
-                        <DownloadIcon/>
+                        <DownloadIcon />
                     </Button>
                 </div>
                 <iframe
